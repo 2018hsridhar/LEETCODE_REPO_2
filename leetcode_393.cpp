@@ -82,7 +82,6 @@ public:
                     }
                     break;
                 default:
-                    // fmt.Printf("Should not be in default case.");
                     return false;
             }
         }
@@ -93,41 +92,33 @@ public:
     // gaaaah
     bool passTwoBitsTest(int data){
         // Int -> ULL well defined in C standard too :-)
+        data >>= 6;
         unsigned long long ull = data;
         std::bitset<8> dataBits{ull};
-        // std::bitset<8> twoBitsTest{"11111111"};
-        // auto testRes = dataBits & twoBitsTest;
-        return (dataBits.test(7) && !dataBits.test(6));
-        // return (testRes == 0b10000000);
+        return (dataBits == 0b00000010);
     }
 
     // Thank god for the bitset in stdLib
     int getByteType(int data) {
         // Binary String constructor for bitset and templation
-        unsigned long long ull = data;
-        std::bitset<8> dataBits{ull};
-        // std::bitset<8> oneMask{"11111111"}; 
-        // std::bitset<8> twoMask{"11111111"}; 
-        // std::bitset<8> threeMask{"11111111"}; 
-        // std::bitset<8> fourMask{"11111111"};
-        // auto oneTest = dataBits & oneMask;
-        // auto twoTest = dataBits & twoMask;
-        // auto threeTest = dataBits & threeMask;
-        // auto fourTest = dataBits & fourMask;
-        // if(oneTest == 0b00000000){
-        if(dataBits.test(7) == false){
+        unsigned long long ullOne = (data >> 7);
+        unsigned long long ullTwo = (data >> 5);
+        unsigned long long ullThree = (data >> 4);
+        unsigned long long ullFour = (data >> 3);
+        std::bitset<8> dataBitsOne{ullOne};
+        std::bitset<8> dataBitsTwo{ullTwo};
+        std::bitset<8> dataBitsThree{ullThree};
+        std::bitset<8> dataBitsFour{ullFour};
+        if(dataBitsOne == 0b00000000){
             return 1;
         }
-        // if(twoTest.test(7) ==  == 0b11000000){
-        if(dataBits.test(7) && dataBits.test(6) && !dataBits.test(5)){
+        if(dataBitsTwo == 0b00000110){
             return 2;
         }
-        // if(threeTest == 0b11100000){
-        if(dataBits.test(7) && dataBits.test(6) && dataBits.test(5) && !dataBits.test(4)){
+        if(dataBitsThree == 0b00001110){
             return 3;
         }
-        // if(fourTest == 0b11110000){
-        if(dataBits.test(7) && dataBits.test(6) && dataBits.test(5) && dataBits.test(4) && !dataBits.test(3)){
+        if(dataBitsFour == 0b00011110){
             return 4;
         }
         return 0;
