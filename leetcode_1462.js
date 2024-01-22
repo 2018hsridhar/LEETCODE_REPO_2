@@ -74,10 +74,15 @@ var checkIfPrerequisite = function(numCourses, prerequisites, queries) {
     }
     let adjList = initMapSet(numCourses)
     let prereqMap = initMapSet(numCourses)
+    let queryResponse = Array(q).fill(false)
     solveInDeg(inDegMap,numCourses,prerequisites)
     makeAdjList(adjList,numCourses,prerequisites)
     execTopSort(prereqMap,inDegMap,adjList)
-    let queryResponse = Array(q).fill(false)
+    solveQueryResponse(queryResponse,queries,prereqMap)
+    return queryResponse
+};
+
+function solveQueryResponse(queryResponse,queries,prereqMap) {
     let wIdx = 0
     queries.forEach((query) => {
         let uj = query[0]
@@ -87,5 +92,4 @@ var checkIfPrerequisite = function(numCourses, prerequisites, queries) {
         }
         wIdx++
     })
-    return queryResponse
-};
+}
