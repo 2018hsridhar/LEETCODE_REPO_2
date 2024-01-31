@@ -8,6 +8,8 @@ Any two adjacent elements with the same number of set_bits ( take note of this )
 
 The number of set_bits = popcount ( https://en.cppreference.com/w/cpp/numeric/popcount ) 
 Adjacency invariant yields power to problem 
+
+Complexity : Time = O(N) Space = O(1)
 */
 class Solution {
 public:
@@ -16,8 +18,7 @@ public:
         // 8 bits max only : pow(2,8) bounding
         // popcount ranges can go [1,1,1,2,2,3,3,1,1,1,4,4] type of thing
         // localMax of each popCountGrp
-        bool canSort = true;
-        std::vector<vector<int>> grpStats; 
+        std::vector<int> grpStats{INT_MAX, INT_MIN}; // ordering : min, max
         int localMax = nums.at(0);
         int localMin = nums.at(0);
         for(int i = 0; i < nums.size() - 1; i++){
@@ -26,26 +27,19 @@ public:
             int popCountOne = std::popcount((unsigned int)nums.at(i));
             int popCountTwo = std::popcount((unsigned int)nums.at(i+1));
             if(popCountOne != popCountTwo){
-                grpStats.push_back(vector<int>{localMin,localMax});
-                localMax = nums.at(i+1);
-                localMin = nums.at(i+1);
+                if(localMin < grpStats.at(1)){
+                    return false;
+                } else {
+                    grpStats.at(0) = localMin;
+                    grpStats.at(1) = localMax;
+                    localMax = nums.at(i+1);
+                    localMin = nums.at(i+1);
+                }
             } else {
                 localMin = min(localMin,nums.at(i+1));
                 localMax = max(localMax,nums.at(i+1));
             }
         }
-        grpStats.push_back(vector<int>{localMin,localMax});
-        // for(auto x : grpStats){
-        //     cout << x.at(0) << ", " << x.at(1) << endl;
-        // }
-        for(int i = 0; i < grpStats.size() - 1; i++){
-            auto gmOne = grpStats.at(i);
-            auto gmTwo = grpStats.at(i+1);
-            if(gmOne.at(1) > gmTwo.at(0)){
-                canSort = false;
-                break;
-            }
-        }
-        return canSort;      
+        return (localMin > grpStats.at(1));
     }
 };
