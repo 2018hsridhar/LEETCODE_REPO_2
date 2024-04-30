@@ -14,10 +14,9 @@ S = O(1) ( E & I )
 '''
 class Solution:
     def bagOfTokensScore(self, tokens: List[int], power: int) -> int:
-        n = len(tokens)
         tokens.sort()
         lPtr = 0
-        rPtr = n - 1
+        rPtr = len(tokens) - 1
         # Check our while statement later.
         # wait what if we get a case where we attempted to go up in score - but it didn't work too?
         # idea : keep track of a running max global score as well
@@ -28,16 +27,12 @@ class Solution:
                 power -= tokens[lPtr]
                 curScore += 1
                 lPtr += 1
-            elif( power < tokens[lPtr]):
-                if(curScore >= 1):
-                    if(rPtr > lPtr):
-                        power += tokens[rPtr]
-                        rPtr -= 1
-                        curScore -= 1
-                    elif(lPtr <= rPtr):
-                        break
-                else:
-                    # hit terminal state : can not increase power nor execute left players <--- problem constraint
-                    break
+            elif( power < tokens[lPtr] and curScore >= 1):
+                power += tokens[rPtr]
+                rPtr -= 1
+                curScore -= 1
+            else:
+                # hit terminal state : can not increase power nor execute left players <--- problem constraint
+                break
             maxRunScore = max(maxRunScore, curScore)
         return maxRunScore
