@@ -21,26 +21,35 @@ It is minimization here
 class Solution:
     def removeAlmostEqualCharacters(self, word: str) -> int:
         # don't get to max -> save on bits/memFtPrint
-        minOpsNeeded = len(s)
-        n = len(s)
+        minOpsNeeded = len(word)
+        n = len(word)
         memo = [-1 for i in range(len(word))]
-        for i,curChar in list(reversed(enumerate(s))):
+        # enumerate() -> returns iterator
+        for i,curChar in reversed(list(enumerate(word))):
             # default of 0 ( single char case )
-            curSubProblem = 0
+            curSubProblem = len(word)
+            # check second char swap
+            if(i+1 < n and i+2 < n):
+                secondChar = word[i+2]
+                # even if firstChar and curChar deviate, that doesn't matter
+                if(abs(ord(secondChar) - ord(firstChar)) <= 1):
+                    curSubProblem = min(curSubProblem, 1 + memo[i+2])
+                else:
+                    if(abs(ord(firstChar) - ord(curChar)) <= 1):
+                        curSubProblem = min(curSubProblem, 1 + memo[i+2])
+                    else:
+                        curSubProblem = min(curSubProblem, 0 + memo[i+1])
+            # check first char swap
+            # mofo : `elif`` saves 3 characters over `else if`
             if(i+1 < n):
-                # check first char swap
                 firstChar = word[i+1]
                 if(abs(ord(firstChar) - ord(curChar)) <= 1):
                     curSubProblem = min(curSubProblem, 1 + memo[i+1])
                 else:
-                    curSubProblem = min(curSubProblem, memo[i+1])
-                if(i+2 < n):
-                # check second char swap
-                    secondChar = word[i+2]
-                    if(abs(ord(secondChar) - ord(firstChar)) <= 1):
-                        curSubProblem = min(curSubProblem, 1 + memo[i+2])
-                    else:
-                        curSubProblem = min(curSubProblem, 1 + memo[i+1])
+                    curSubProblem = min(curSubProblem, 0 + memo[i+1])
+            elif ( i+1 >= n):
+                # last character base case anyways
+                curSubProblem = 0
             memo[i] = curSubProblem
         minOpsNeeded = memo[0]
         return minOpsNeeded
