@@ -11,15 +11,19 @@ So many attribute not defined errors
 class Solution:
     def watchedVideosByFriends(self, watchedVideos: List[List[str]], friends: List[List[int]], id: int, level: int) -> List[str]:
         uniqueIdsAtLevel = self.getIdsAtLevel(id, level, friends)
-        vidFreq = self.createVidFreqMap(watchedVideos, uniqueIdsAtLevel)
         print(uniqueIdsAtLevel)
+        vidFreq = self.createVidFreqMap(watchedVideos, uniqueIdsAtLevel)
         # modularize lambda function in-place sort please
         friendVideos = []
         for k, v in vidFreq.items():
             friendVideos.append([k,v])
 # https://www.freecodecamp.org/news/lambda-sort-list-in-python/            
-        friendVideos.sort(key=lambda ndVec: (ndVec[0], ndVec[0]))
-        return friendVideos
+        # list comprehension enables filtering ability
+        # match list comp : [] style
+        friendVideos.sort(key=lambda ndVec: (ndVec[1], ndVec[0]))
+        # sort in place : use list later ( iterable of None can cause issues -> preserve in list form only )
+        friendVideosFiltered = [x[0] for x in friendVideos]
+        return friendVideosFiltered
 
     # super concise yet expressive type system -> readability bolstering
     def createVidFreqMap(self, watchedVideos: List[List[str]], levelIds:List[int]):
@@ -38,7 +42,7 @@ class Solution:
     def getIdsAtLevel(self, rootId:int, targetLevel:int, friends: List[List[int]]) -> set:
         # never pass self in param list
         adjList = self.createAdjList(friends)
-        print(adjList)
+        # print(adjList)
         uniqueLevelIds = set()
         queue = [[rootId,0]]
         visited = set()
@@ -46,17 +50,19 @@ class Solution:
             parentPair = queue.pop(0)
             parentId = parentPair[0]
             parentLevel = parentPair[1]
+            # print("parentId = " + str(parentId))
+            # print("parent level = " + str(parentLevel))
             if parentId not in visited:
                 visited.add(parentId)
-            if(parentLevel == targetLevel):
-                uniqueLevelIds.add(parentLevel)
-            elif(parentLevel < targetLevel):
-                # set method Py3 facilitates quick add :-)
-                children = friends[parentId]
-                for child in children:
-                    childLevel = parentLevel + 1
-                    # list is append() not add
-                    queue.append([child,childLevel])
+                if(parentLevel == targetLevel):
+                    uniqueLevelIds.add(parentId)
+                elif(parentLevel < targetLevel):
+                    # set method Py3 facilitates quick add :-)
+                    children = friends[parentId]
+                    for child in children:
+                        childLevel = parentLevel + 1
+                        # list is append() not add
+                        queue.append([child,childLevel])
         # can we immediate listify ( or just use set form anyways -> more guarantees )
         # return list(uniqueLevelIds)
         return uniqueLevelIds
@@ -64,11 +70,9 @@ class Solution:
     # Python3 is so fast with the creation of dynamically-typed data structures OMG
     def createAdjList(self, friends: List[List[int]]) -> dict():
         adjList = dict()
-        for index, pair in enumerate(friends):
-            fOne = pair[0]
-            fTwo = pair[1]
+        for index, curFriends in enumerate(friends):
             if index not in friends:
                 adjList[index] = set()
-            adjList[index].add(fOne)
-            adjList[index].add(fTwo)
+            for friend in curFriends:
+                adjList[index].add(friend)
         return adjList
