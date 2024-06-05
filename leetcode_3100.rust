@@ -1,0 +1,36 @@
+/*
+Exploring Rust programming language
+Seems OOP driven ( figuring that out too ) 
+
+URL := https://leetcode.com/problems/score-of-a-string/
+3110. Score of a String
+
+Commit log :
+a. In bytes ( not chars ) -> string length
+b. char -> byte slice -> reference to first byte
+c. 
+
+let byteSliceRight = s[byteIndex+1].as_bytes();
+So many unstable library features ( does this language even have stability )?
+
+*/
+
+impl Solution {
+    pub fn score_of_string(s: String) -> i32 {
+        let string_score = 0;
+        let n = s.len();
+        // for (index,letter) in s.chars().enumerate() {
+        for (byteIndex,letter) in s.char_indices()  {
+            if(byteIndex + 1 < n) {
+                let byteSliceLeft = s.chars().nth(byteIndex).unwrap();
+                let byteSliceRight = s.chars().nth(byteIndex+1).unwrap();
+                // let asciiValLeft = byteSliceLeft.as_ref()[0];
+                let asciiValLeft = byteSliceLeft.as_ascii();
+                let asciiValRight = byteSliceRight.as_ascii();
+                // let asciiValLeft = byteSliceRight.as_ref()[0];
+                string_score += (asciiValLeft - asciiValLeft).abs();
+            }
+        }
+        return string_score;
+    }
+}
