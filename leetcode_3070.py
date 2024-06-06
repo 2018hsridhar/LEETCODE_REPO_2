@@ -10,6 +10,7 @@ T = O(MN)
 S = O(MN) ( E ) O(1) (I)
 
 15 mins to solutioning 
+15 minutes beat 100% of users ( mem ) 90% ( runtime )
 
 Commit log :
 (A) List comprehension : j then i, or vice versa in ordering
@@ -20,21 +21,13 @@ Commit log :
 class Solution:
     def countSubmatrices(self, grid: List[List[int]], k: int) -> int:
         countMat = 0
-        m = len(grid)
-        n = len(grid[0])
-        cache = [[0 for j in range(n)] for i in range(m)]
-        # x = [[foo for i in range(10)] for j in range(10)]
-        for c in range(n):
-            colSum = 0
-            for r in range(m):
-                colSum += grid[r][c]
-                cache[r][c] = colSum
-        for r in range(m):
-            # start at 0-init ( no bounds checking code needed ) 
-            curSum = 0
-            for c in range(n):
-                curSum = curSum + cache[r][c]
+        colSums = [0 for i in range(len(grid[0]))]
+        curSum = 0
+        for r in range(len(grid)):
+            for c in range(len(grid[0])):
+                colSums[c] = colSums[c] + grid[r][c]
+                curSum += colSums[c]
                 if(curSum <= k):
                     countMat += 1
+            curSum = 0
         return countMat
-        
