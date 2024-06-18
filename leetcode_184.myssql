@@ -1,0 +1,21 @@
+-- 184. Department Highest Salary
+-- https://leetcode.com/problems/department-highest-salary/description/
+# Write your MySQL query statement below
+-- In each department, let us find the highest salary ( group by MAX ) 
+-- Any order return -> get employees later
+-- can get duplicate maxes over each department too ( create a subtable to JOIN on later ) ?
+-- careful on unknown col names issues
+-- 11 minutes
+
+WITH CTE1 AS 
+(
+    SELECT E.departmentId AS "id", MAX(E.salary) AS "salary", D.name AS "deptName" FROM Employee AS E
+    JOIN Department AS D
+    ON E.departmentId = D.id 
+    GROUP BY E.departmentId
+)
+-- SELECT * FROM CTE1
+SELECT CTE1.deptName AS Department, E.name AS Employee, CTE1.salary as Salary  FROM Employee AS E
+JOIN CTE1
+ON E.departmentId = CTE1.id
+AND E.salary = CTE1.salary
