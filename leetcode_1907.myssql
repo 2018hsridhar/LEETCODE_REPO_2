@@ -1,0 +1,48 @@
+-- 1907. Count Salary Categories
+-- https://leetcode.com/problems/count-salary-categories/
+--  Write your MySQL query statement below
+-- Bucketization MySQL Question : get count of each salary
+-- To write conditional logic or not? Can we do a type of aggregation
+-- Counting is correct -> but if we are missing average, fill it in
+-- Can create a temporary table? Or something else?
+-- https://stackoverflow.com/questions/13887616/mysql-if-elseif-in-select-query
+-- CREATE TEMPORARY TABLE DefaultSalary (
+--     Salary varchar(255),
+--     SalaryCount int
+-- )
+-- INSERT INTO DefaultSalary (Salary,SalaryCount) VALUES ('Low Salary', 0)
+-- INSERT INTO DefaultSalary (Salary,SalaryCount) VALUES ('Average Salary', 0)
+-- INSERT INTO DefaultSalary (Salary,SalaryCount) VALUES ("High Salary", 0)\
+-- INSERT INTO DefaultSalary VALUES ('High Salary', 0)
+-- SELECT * FROM DefaultSalary
+-- wow 30 minutes : but leverage CASE statements, CTEs, UNIONs
+WITH 
+    CTE AS
+    (
+        SELECT 
+        (
+            CASE
+                WHEN A.income < 20000 THEN "Low Salary"
+                WHEN A.income >= 20000 AND A.income <= 50000 THEN "Average Salary"
+                ELSE "High Salary"
+            END) AS category
+        FROM Accounts AS A
+    ),
+    CTE2 AS
+    (
+        SELECT CTE.category AS "category", COUNT(CTE.category) AS accounts_count FROM CTE
+        GROUP BY CTE.category
+    )
+SELECT "Low Salary" as category, IFNULL(CTE2.accounts_count,0) AS accounts_count FROM CTE
+LEFT OUTER JOIN CTE2 ON CTE2.category = "Low Salary"
+UNION
+SELECT "Average Salary" as category, IFNULL(CTE2.accounts_count,0) AS accounts_count FROM CTE
+LEFT OUTER JOIN CTE2 ON CTE2.category = "Average Salary"
+UNION
+SELECT "High Salary" as category, IFNULL(CTE2.accounts_count,0) AS accounts_count FROM CTE
+LEFT OUTER JOIN CTE2 ON CTE2.category = "High Salary"
+
+
+
+
+
