@@ -1,0 +1,18 @@
+-- 1158. Market Analysis I
+# Write your MySQL query statement below
+-- Commit Log ::
+-- Online shopping website query patterns
+-- Seems like a LEFT OUTER JOIN ( keep left sidfe of the table ) 
+-- reference order LEFT JOIN matters
+-- https://leetcode.com/problems/market-analysis-i/
+WITH OrderAggr AS
+(
+    SELECT buyer_id, COUNT(order_id) as orders_in_2019 FROM Orders
+    WHERE YEAR(order_date) = 2019
+    GROUP BY buyer_id
+)
+-- SELECT * FROM OrderAggr
+SELECT U.user_id AS buyer_id, U.join_date AS join_date, IFNULL(OrderAggr.orders_in_2019,0) AS orders_in_2019
+FROM Users AS U
+LEFT OUTER JOIN OrderAggr
+ON U.user_id = OrderAggr.buyer_id
