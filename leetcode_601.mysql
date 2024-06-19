@@ -1,0 +1,32 @@
+# Write your MySQL query statement below
+-- Do NOT assume that ID is a primary key.
+-- URL = https://leetcode.com/problems/human-traffic-of-stadium/
+-- 601. Human Traffic of Stadium
+-- Leverage a RANK and GROUP BY later on?
+-- PARITTION BY no row collapse : original vals preserved
+-- SELECT id, visit_date, people,  LAG(people) OVER(ORDER BY people) as ranking FROM Stadium
+-- https://stackoverflow.com/questions/2563918/create-a-cumulative-sum-column-in-mysql
+WITH 
+    CTE1 AS(
+        SELECT id, visit_date, people,
+        CASE
+            WHEN people < 100 THEN 0
+            WHEN people >= 100 THEN 1
+            ELSE 2
+        END as visitFlag FROM Stadium
+    ),
+-- SELECT *, LAG(FLAGCTE.visitFlag) OVER (ORDER BY FLAGCTE.visitFlag) as curCount FROM FLAGCTE
+-- on the bright side, we have running sums computed here :-)
+CTE2 AS (
+    SELECT *, 
+        @running_total := IF(CTE1.visitFlag = 0, 0, @running_total + 1) AS runSum
+    FROM CTE1
+),
+-- SELECT * FROM CTE2
+CTE3 AS (
+    SELECT id, visit_date, people, visitFlag, runSum, LAG(runSum,2) OVER(ORDER BY id) AS deltaOne, LEAD(runSum,2) OVER(ORDER BY ID) as deltaTwo FROM CTE2
+)
+-- SELECT id, visit_date, people FROM CTE3
+-- WHERE people >= 100
+-- AND (((ABS(runSum-deltaOne) >= 2 AND runSum >= 3) OR (deltaOne is null)) OR (((ABS(runSum-deltaTwo) >= 2) AND deltaTwo >= 1) OR (deltaTwo is null)))
+-- SELECT * FROM CTE3
