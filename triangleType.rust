@@ -1,0 +1,38 @@
+/*
+RUST learning curve is steepLine 10: Char 30: error: cannot find value `opt` in crate `std` (solution.rs)
+Learning syntax of a language takes time
+Learning weird expressions takes time
+
+Determine triangle type creatable
+URL = https://leetcode.com/problems/type-of-triangle/description/
+3024. Type of Triangle
+
+*/
+impl Solution {
+    pub fn triangle_type(nums: Vec<i32>) -> String {
+        let mut resultStr = String::from("none");
+        // let stringTypes = vec!["equilateral".to_string(), "isosceles".to_string(), "scalene".to_string()];
+        // let mut stringTypes = vec!["equilateral", "isosceles", "scalene"];
+        // array of reference strings here
+        let mut stringTypes: [&str; 3] = ["equilateral", "isosceles", "scalene"];
+        let sideOne = (nums[0]).abs();
+        let sideTwo = (nums[1]).abs();
+        let sideThree = (nums[2]).abs();
+        let mut lengths = [sideOne,sideTwo,sideThree];
+        lengths.sort(); // in place default
+        if(lengths[0] + lengths[1] <= lengths[2]) {
+            // without .to_string() -> treat as &str I guess?
+            return "none".to_string();
+        }
+        if(sideOne == sideTwo && sideTwo == sideThree){
+            // resultStr = std::opt.as_deref().unwrap_or(stringTypes.get(0));
+            // resultStr = stringTypes.get(0);
+            resultStr = stringTypes[0].to_string();
+        } else if ( sideOne == sideTwo || sideOne == sideThree || sideTwo == sideThree){
+            resultStr = stringTypes[1].to_string();
+        } else if ( sideOne != sideTwo && sideThree != sideTwo){
+            resultStr = stringTypes[2].to_string();
+        }
+        return resultStr;
+    }
+}
