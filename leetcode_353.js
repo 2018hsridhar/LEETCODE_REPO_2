@@ -44,32 +44,32 @@ var SnakeGame = function(width, height, food) {
     this.curFood = food[0]
     this.foodPtr = 0
     this.matrix = new Map()
-    this.matrix[0] = new Map()
-    this.matrix[0][0] = -1
-    curR = this.curFood[0]
-    curC = this.curFood[1]
-    this.matrix[curR][curC] = 1
-    this.size = 1
+    curFoodR = this.curFood[0]
+    curFoodC = this.curFood[1]
+    this.addCellToMatrix(0,0)
+    this.addCellToMatrix(curFoodR,curFoodC)
     // snake as a list of coordinates 
+    this.size = 1
     this.snake = []
     this.snake.push([0,0])
-    this.matrix[0][0] = 0
+    this.matrix.get(0).set(0,0)
+    this.matrix.get(curFoodR).set(curFoodC,1)
     this.score = 0
     this.numMoves = 1
-    // this may or may not execute : take note later please
-    if(this.food !== undefined){
-        nextHeadCell = [0,0]
-        growthStatus = this.growTheSnake(nextHeadCell)
-        if(growthStatus){
-            curMoveScore += 1
-            nextHeadCell = this.getNextHeadCell(nextHeadCell,direction)
-            this.snake.unshift(nextHeadCell)
-            nextR = nextHeadCell[0]
-            nextC = nextHeadCell[1]
-            this.matrix[nextR][nextC] = 0
+};
+
+SnakeGame.prototype.addCellToMatrix = function(r,c){
+    if(!this.matrix.has(r)){
+        this.matrix.set(r,new Map())
+        if(!this.matrix.get(r).has(c)){
+            this.matrix.get(r).set(c,-1)
+        }
+    } else if (this.matrix.has(r)){
+        if(!this.matrix.get(r).has(c)){
+            this.matrix.get(r).set(c,-1)
         }
     }
-};
+}
 
 /** 
  * @param {string} direction
@@ -89,10 +89,10 @@ SnakeGame.prototype.move = function(direction) {
     nextHeadCell = this.getNextHeadCell(nextHeadCell,direction)
     nextR = nextHeadCell[0]
     nextC = nextHeadCell[1]
+    this.addCellToMatrix(nextR,nextC)
     // hit snake : only after you unshift the cell should we test it too
     if(!this.isInBounds(nextHeadCell)){
         // game over : return -1 ( both head occupies body OR out of bounds wall hit! )
-        console.log("OOB")
         return -1
     } else {
         this.snake.unshift(nextHeadCell)
@@ -104,34 +104,26 @@ SnakeGame.prototype.move = function(direction) {
                 lastSnakeCell = this.snake.pop()
                 lastR = lastSnakeCell[0]
                 lastC = lastSnakeCell[1]
-                this.matrix[lastR][lastC] = -1
+                this.matrix.get(lastR).set(lastC,-1)
             }
         }
         // check if snake hit itself
         if(this.hitSnake(nextHeadCell)){
-            console.log("Hit self")
             return -1
         }
-        if(!this.matrix.has(nextR)){
-            this.matrix[nextR] = new Map()
-            if(!this.matrix[nextR].has(nextC)){
-                this.matrix[nextR][nextC] = 0
-            }
-        }
-        this.matrix[nextR][nextC] = 0
+        this.matrix.get(nextR).set(nextC,0)
         if(growthStatus){
             this.score = this.score + 1
             curMoveScore = this.score
         }
     }
-    // console.log(this.snake)
     return curMoveScore
 };
 
 SnakeGame.prototype.hitSnake = function(curCell) {
     curR = curCell[0]
     curC = curCell[1]
-    cellStatus = this.matrix[curR][curC]
+    cellStatus = this.matrix.get(curR).get(curC)
     hitSelfStatus = (this.snake.length > 4 && cellStatus == 0)
     return hitSelfStatus
 }
@@ -139,8 +131,6 @@ SnakeGame.prototype.hitSnake = function(curCell) {
 // name = function(parameters)
 SnakeGame.prototype.getNextHeadCell = function(curHeadCell,direction){
     nextHeadCell = curHeadCell
-    // console.log(direction)
-    // console.log("Before application, cell = " + nextHeadCell)
     switch(direction) {
         case 'L':
             nextHeadCell[1] -= 1
@@ -155,7 +145,6 @@ SnakeGame.prototype.getNextHeadCell = function(curHeadCell,direction){
             nextHeadCell[0] += 1
             break
     }
-    // console.log("After application, cell = " + nextHeadCell)
     return nextHeadCell
 }
 
@@ -177,7 +166,7 @@ SnakeGame.prototype.growTheSnake = function(headCell) {
 SnakeGame.prototype.isInBounds = function(cell) {
     r = cell[0]
     c = cell[1]
-    return ((0 <= r && r < this.width) && (0 <= c && c < this.height))
+    return ((0 <= r && r < this.height) && (0 <= c && c < this.width))
 }
 
 /** 
