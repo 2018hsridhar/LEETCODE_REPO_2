@@ -1,81 +1,77 @@
+Intuition and Approach :
+What if list lengths were the same, but the shorter list had leading zeros as mock placeholder values
+Leverage the mock zeros, and execute addition operation as is, but recursively ( from the bottom-up )
+If the final carry over value > 0, add said value as a new node
+Complexity
+Time complexity:
+Let M:=len(l1),N:=len(l2),O:=max(M,N)
+Performance = O(O)
+
+Space complexity:
+Space
+O(O) ( E )
+O(O) ( Implicit call stack )
+
+Code
 # Definition for singly-linked list.
 # class ListNode:
 #     def __init__(self, val=0, next=None):
 #         self.val = val
 #         self.next = next
-
 '''
-URL := https://leetcode.com/problems/add-two-numbers-ii/
+URL := https://leetcode.com/problems/add-two-numbers-ii/description/
 445. Add Two Numbers II
 
-Idea : prefix add <0> nodes to the front of the smaller list
-Recursively compute node values
-and if a carry is left at the end -> go append a final node
-
-Complexity
-Let N := #-nodes in our SLL
-T = O(N)
-S = O(N) ( E ) O(1) ( I ) 
-
-return types : < int, ListNode > -> how to return both as a package though?
-Get to thsi problem later and please just go to sleep now hari :-) 
 '''
-
-
 class Solution:
     def addTwoNumbers(self, l1: Optional[ListNode], l2: Optional[ListNode]) -> Optional[ListNode]:
-        m = self.getSize(l1)
-        n = self.getSize(l2)
-        delta = abs(m - n)
-        if(m < n):
-            # name is not defined error
-            self.appendZeroPrefix(l1,delta)
+        lenOne = self.getListLength(l1)
+        lenTwo = self.getListLength(l2)
+        maxLen = max(lenOne,lenTwo)
+        delta = abs(lenOne - lenTwo)
+        # equality case : ignore code path :-)
+        if(lenOne < lenTwo):
+            l1 = self.populateLeadingZeros(l1,delta)
+        elif(lenOne > lenTwo):
+            l2 = self.populateLeadingZeros(l2,delta)
+        l3 = None
+        l3 = self.populateLeadingZeros(l3,maxLen)
+        finalCarry = self.addNumbers(l1,l2,l3)
+        targetList = l3
+        if(finalCarry > 0):
+            carryNode = ListNode(finalCarry)
+            carryNode.next = l3
+            targetList = carryNode
+        return targetList
+
+    # can modify in place why create a new list
+    # well creation of new list is cleaner -> but gaaah this ain't javascript
+    # return a (node,carry) operation? effort much?
+    def addNumbers(self, listOne: ListNode, listTwo:ListNode, listThree: ListNode) -> int:
+        carry = 0
+        if(listOne.next is None and listTwo.next is None):
+            sum = listOne.val + listTwo.val
+            listThree.val = (sum % 10 )
+            carry = floor(sum / 10)
         else:
-            self.appendZeroPrefix(l2,delta)
-        # Create an empty list ( L3 ) -> hey it's all zero-ed out here
-        iCurr = ListNode(0)
-        for i in range(m-1):
-            iNext = ListNode(0)
-            iCurr.next = iNext
-            iCurr = iNext
-        lastFwdCarry = self.recurseCompute(l1,l2,iCurr)
-        iFinal = iCurr
-        if(lastFwdCarry > 0):
-            iFinal = ListNode(0)
-            iFinal.next = iCurr
-        return iFinal
+            carryOver = self.addNumbers(listOne.next,listTwo.next, listThree.next)
+            sum = listOne.val + listTwo.val + carryOver
+            listThree.val = (sum % 10 )
+            carry = floor(sum / 10)
+        return carry
 
-    # Optional[Type] based system in parameter passing.
-    def recurseCompute(self, l1: Optional[ListNode], l2: Optional[ListNode], lTerm: Optional[ListNode]) -> int:
-        fwdCarry = 0
-        if(l1 != None and l2 != None and l1.next != None and l2.next != None):
-            fwdCarry = self.recurseCompute(l1.next,l2.next, lTerm.next)
-        curSum = l1.val + l2.val + fwdCarry
-        if(curSum >= 10):
-            curSum %= 10
-            fwdCarry = curSum / 10
-        lTerm.val = curSum
-        return fwdCarry
-    
-    def appendZeroPrefix(self, mySLL: Optional[ListNode], delta: int) -> None:
-        curr = ListNode(0)
-        firstNode = curr
-        for i in range(delta):
-            next = ListNode(0)
-            curr.next = next
-        curr.next = mySLL
-        return firstNode
+    def populateLeadingZeros(self, inputList: Optional[ListNode], steps: int) -> ListNode:
+        head = inputList
+        for x in range(steps):
+            zeroNode = ListNode(0)
+            zeroNode.next = head
+            head = zeroNode
+        return head
 
-# no use of `new` keyword in python weirdly
-    def getSize(self, l1: Optional[ListNode]) -> int:
-        listSize = 0
-        while l1 != None:
-            listSize += 1
-            l1 = l1.next
-        return listSize
-        
-
-
-
-
+    def getListLength(self, head: Optional[ListNode]) -> int:
+        listLength = 0
+        while(head is not None):
+            head = head.next
+            listLength += 1
+        return listLength
         
